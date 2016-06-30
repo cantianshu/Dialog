@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="http://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
+  <!-- <script src="//cdn.bootcss.com/jquery/1.10.0/jquery.min.js"></script> -->
+  <script type="text/javascript" src="js.js" ></script> 
+</head>
+<style type="text/css">
+  .dialog-mask {
+    background: #000 none repeat scroll 0 0;
+    left: 0;
+    opacity: 0.5;
+    position: absolute;
+    top: 0;
+    z-index: 5000;
+    height: 100%;
+    width: 100%;
+  }
+
+.dialog-wrap{
+  position: fixed;
+  font-size:16px;
+  color:#fff;
+  text-align:center;
+  background-color:#0f0;
+}
+.dialog-close{
+  position: absolute;
+  top:0;
+  right:0;
+  display: block;
+  height: 20px;
+  width:20px;
+}
+</style>
+<script type="text/javascript">
+  
+  window.onload = function () {
+
+    document.getElementById('aa').onclick= function () {
+      var opt = {content:'<li data-role="btn">111111测试一下弹中弹1111111</li><li>1111111111111111</li><li>1111111111111111</li><li>1111111111111111</li>',
+                  maskClose: true,
+                  height:'300px',
+                }
+
+      DialogSingle.show( opt );
+
+      return false;
+    };
+
+
+    $('body').on('click', '[data-role=btn]', function () {
+      var w = parseInt( Math.random()*1500);
+      console.log(w);
+      var opt = {content:$('#ul').html(),
+                  maskClose: true,
+                  height:'400px',
+                  width: w
+                }
+//'<li data-role="btn">我是弹中弹 内容展示</li> <li>我是弹中弹 内容展示</li><li>我是弹中弹 内容展示</li><li>我是弹中弹 内容展示</li>'
+      DialogSingle.show( opt );
+
+      return false;
+
+    });
+
+  };
+
+</script>
+<body>
+  
+<center>
+<br/><br/><br/><br/>
+
+  <a href="#" id="aa">显示弹窗口btn</a>
+
+
+<div class="cont">
+
+  <ul class="ul" id="ul">
+    <li data-role="btn">测试弹中弹</li>
+    <li>我是页面静态内容啊</li>
+    <li>1111111111111111</li>
+    <li>1111111111111111</li>
+  </ul>
+
+</div>
+
+
+
+
+</center>
+
+</body>
+</html>
