@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <title>Document</title>
   <script src="http://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
-  <!-- <script src="//cdn.bootcss.com/jquery/1.10.0/jquery.min.js"></script> -->
-  <script type="text/javascript" src="js.js" ></script> 
+  <!-- <script src="//cdn.bootcss.com/jquery/1.10.0/jquery.min.js"></script>
+-->
+<script type="text/javascript" src="js.js" ></script>
 </head>
 <style type="text/css">
+/*--------------------------------*/
   .dialog-mask {
     background: #000 none repeat scroll 0 0;
     left: 0;
@@ -34,6 +36,76 @@
   height: 20px;
   width:20px;
 }
+/*-------------------showtip---S-----------------------------------*/
+.sso-login-msg-tip {
+  height: 100%;
+  left: 0;
+  margin: 0 auto;
+  min-height: 100%;
+  min-width: 100%;
+  position: fixed;
+  text-align: center;
+  top: 0;
+  width: 100%;
+  z-index: 90000;
+
+}
+
+.sso-login-msg-tip label {
+
+
+}
+
+
+
+/*--------------------------------------------------------------------------*/
+
+
+.layer, .layer-msg-tip {
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+}
+.layer .cover, .layer-msg-wrap .layer-cover  {
+    background: #000 none repeat scroll 0 0;
+    bottom: 0;
+    left: 0;
+    opacity: 0.4;
+    filter:Alpha(Opacity=60);
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+.layer .tip , .layer-msg-wrap .layer-txt-out{
+    font-size: 14px;
+    font-weight: 600;
+    height: 40px;
+    line-height: 40px;
+    margin-top: -20px;
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    width: 100%;
+    color: #fff;
+}
+.layer-msg-wrap .layer-txt-out span{
+      padding:6px 14px;
+}
+.layer-msg-wrap .layer-txt-out .layer-txt-bg{
+  background-color: gray;
+  border-radius: 8px;
+}
+
+.layer-msg-wrap .layer-txt-out .loading{
+ background-image: url('http://src.leju.com/imp/imp/deal/b0/0d/c/ce3b68356db8502338b063ec19d_p24_mk24.gif');
+  background-repeat: no-repeat;
+  background-size: 14px 14px;
+  background-position: 8px center;
+  padding-left:30px;
+}
+
 </style>
 <script type="text/javascript">
   
@@ -50,6 +122,106 @@
       return false;
     };
 
+/*--------------showtip---S---------------------------------*/
+
+
+  var utl = {
+        $:function (id){ return document.getElementById( id ) || null; },
+    　　addHandler : function(ele, type, handler){
+            if (!ele) return false;
+    　　　　if (ele.addEventListener) {
+    　　　　　　ele.addEventListener(type, handler, false);
+    　　　　} else  if ( ele.attachEvent) {
+    　　　　　　ele.attachEvent('on' +type, handler);
+    　　　　} else {
+    　　　　　　ele['on' +type] =  handler;
+    　　　　}
+    　　},
+
+    　　removeHandler : function (ele, type, handler) {
+            if (!ele) return false;
+    　　　　if (ele.removeEventListener) {
+    　　　　　　ele.removeEventListener(type, handler, false);
+    　　　　} else if (ele.detachEvent) {
+    　　　　　　ele.detachEvent('on'+type, handler);
+    　　　　}else {
+    　　　　　　ele['on'+type]=null;
+    　　　　}
+    　　}
+  };
+  
+    utl.msgTip = {
+        layer:null,
+        tms:null,
+        show: function (msg, cover, ts, loading) {//msg  遮罩 定时关闭秒  loading圈
+            var cover = cover || false,
+                ts = (typeof(ts) == 'undefined') ? 3 : ts;
+                tid = utl.$('sso-login-msg-tip'),
+                cHtml = '<div class="layer-cover"></div>',
+                lHtml = '<div class="layer-txt-out"><span class="layer-txt-bg loading">'+msg+'</span></div>';
+            if (!tid){
+              tid = document.createElement('div');
+              tid.id = 'sso-login-msg-tip';
+              tid.setAttribute('class','layer-msg-wrap');
+              document.getElementsByTagName("body")[0].appendChild( tid );
+            }
+            if(cover){
+              tid.innerHTML = cHtml + lHtml.replace(/layer-txt-bg/,'');
+            } else {
+              if (!loading) { lHtml = lHtml.replace(/loading/,''); }
+              tid.innerHTML = lHtml;
+            }
+            utl.addHandler(tid,'click',  utl.msgTip.hide);//!cover && 
+            if (ts > 0) {
+              clearTimeout(utl.msgTip.tms);
+              utl.msgTip.tms = setTimeout(function () {
+                  utl.msgTip.hide();
+              }, ts * 1e3);
+            }
+        },
+
+        loading:function (msg, cover, ts) {
+          var cover = (typeof(cover)=='undefined') ? 1 : cover, 
+              ts = (typeof(ts) == 'undefined') ? 5 : ts;
+          utl.msgTip.show( msg, cover, ts, 1);
+        },
+
+        hide: function ( t ) {
+            var tid = utl.$('sso-login-msg-tip');
+            tid.style.display = 'none';
+            tid.parentNode.removeChild( tid );
+            utl.removeHandler(tid,'click', utl.msgTip.hide);
+            utl.msgTip.tms && clearTimeout(utl.msgTip.tms);
+            utl.msgTip.tms = null;
+        }
+    };
+
+
+/*----------------------------------------------------*/
+
+
+function addLoadingLayer() {
+    if (addLoadingLayer.$layer) {
+        return;
+    }
+    var $layer = $([
+        '<div class="layer">',
+            '<div class="cover"></div>',
+            '<div class="tip">加载中...</div>',
+        '</div>'
+    ].join(''));
+    $('body').append($layer);
+    addLoadingLayer.$layer = $layer;
+}
+
+
+function removeLayer() {
+    if (addLoadingLayer.$layer) {
+        addLoadingLayer.$layer.remove();
+        addLoadingLayer.$layer = undefined;
+    }
+}
+/*-------------------------------------------------------------------------*/
 
     $('body').on('click', '[data-role=btn]', function () {
       var w = parseInt( Math.random()*1500);
@@ -59,37 +231,63 @@
                   height:'400px',
                   width: w
                 }
-//'<li data-role="btn">我是弹中弹 内容展示</li> <li>我是弹中弹 内容展示</li><li>我是弹中弹 内容展示</li><li>我是弹中弹 内容展示</li>'
       DialogSingle.show( opt );
 
       return false;
 
+    }).on('click', '#showTip', function () {
+      
+         utl.msgTip.show('显示短提示');
+
+    }).on('click', '#showTipLoadingCover', function () {
+
+        utl.msgTip.loading('loading 有遮罩');
+
+    }).on('click', '#showTipLoading', function () {
+
+      utl.msgTip.loading('loading 无遮罩',0);
+      
+    }).on('click', '#showLoading', function () {
+      
+      addLoadingLayer();
+    
     });
+
 
   };
 
 </script>
 <body>
-  
+
 <center>
-<br/><br/><br/><br/>
+  <br/>
+  <br/>
+  <br/>
+  <br/>
 
   <a href="#" id="aa">显示弹窗口btn</a>
 
+  <a href="#" id="showLoading">jQuery-showLoading</a>
 
-<div class="cont">
+  <br/>
+  <br/>
 
-  <ul class="ul" id="ul">
-    <li data-role="btn">测试弹中弹</li>
-    <li>我是页面静态内容啊</li>
-    <li>1111111111111111</li>
-    <li>1111111111111111</li>
-  </ul>
+  <a href="#" id="showTip">显示短提示</a>
 
-</div>
+  <a href="#" id="showTipLoadingCover">loading 有遮罩</a>
 
+  <a href="#" id="showTipLoading">loading 无遮罩</a>
 
+  <div class="cont">
 
+    <ul class="ul" id="ul">
+      <li data-role="btn">测试弹中弹</li>
+      <li>我是页面静态内容啊</li>
+      <li>1111111111111111</li>
+      <li>1111111111111111</li>
+    </ul>
+
+  </div>
 
 </center>
 
